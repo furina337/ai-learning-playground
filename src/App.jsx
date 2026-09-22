@@ -3,13 +3,14 @@ import ModuleList from './components/ModuleList.jsx'
 import ModuleDetail from './components/ModuleDetail.jsx'
 import Simulator from './components/Simulator.jsx'
 import NetworkDiagram from './components/NetworkDiagram.jsx'
+import AboutPage from './components/AboutPage.jsx'
 import modules from './data/modules.js'
 import quizzes from './data/quizzes.js'
 
 const STORAGE_KEY = 'ai-learning-playground-progress'
 
 function App() {
-  const [view, setView] = useState('list') // 'list' | moduleId | 'simulator'
+  const [view, setView] = useState('list') // 'list' | moduleId | 'simulator' | 'about'
   const [completedModules, setCompletedModules] = useState([])
 
   useEffect(() => {
@@ -47,6 +48,7 @@ function App() {
   const selectedModule = modules.find((mod) => mod.id === view)
   const showList = view === 'list'
   const showSimulator = view === 'simulator'
+  const showAboutPage = view === 'about'
 
   return (
     <div className="app">
@@ -84,11 +86,21 @@ function App() {
         )}
 
         {showSimulator && <Simulator onBack={handleBack} />}
+
+        {showAboutPage && <AboutPage onBack={handleBack} />}
       </main>
 
-      <footer className="app-footer">
-        <p>Dibuat untuk lomba web — tema pembelajaran teknologi AI</p>
-      </footer>
+      {!showAboutPage && (
+        <footer className="app-footer">
+          <p>
+            Dibuat oleh <strong>Tim STEMSI</strong> untuk lomba web — tema
+            pembelajaran teknologi AI
+          </p>
+          <button className="about-toggle" onClick={() => setView('about')}>
+            Tentang Kami
+          </button>
+        </footer>
+      )}
     </div>
   )
 }
