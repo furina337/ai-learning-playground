@@ -326,6 +326,17 @@ body {
   font-size: 1.15rem;
 }
 
+.quiz-scenario {
+  background: var(--bg);
+  border-left: 3px solid var(--accent);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  margin-bottom: 14px;
+  font-style: italic;
+}
+
 .quiz-options {
   display: flex;
   flex-direction: column;
@@ -374,6 +385,16 @@ body {
 
 .feedback-wrong {
   color: var(--danger);
+}
+
+.quiz-explanation {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 10px 0 0;
+  line-height: 1.5;
 }
 
 /* Quiz Result */
