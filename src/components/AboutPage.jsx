@@ -40,7 +40,7 @@ function AboutBackground() {
 
 function AboutPage({ onBack }) {
   return (
-    <div className="about-page">
+    <div className="about-page view-transition">
       <AboutBackground />
 
       <button className="btn-back" onClick={onBack}>

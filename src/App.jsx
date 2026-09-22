@@ -4,22 +4,34 @@ import ModuleDetail from './components/ModuleDetail.jsx'
 import Simulator from './components/Simulator.jsx'
 import NetworkDiagram from './components/NetworkDiagram.jsx'
 import AboutPage from './components/AboutPage.jsx'
+import Dashboard from './components/Dashboard.jsx'
 import modules from './data/modules.js'
 import quizzes from './data/quizzes.js'
 
 const STORAGE_KEY = 'ai-learning-playground-progress'
+const STATS_KEY = 'ai-learning-playground-stats'
 
 function App() {
-  const [view, setView] = useState('list') // 'list' | moduleId | 'simulator' | 'about'
+  const [view, setView] = useState('list') // 'list' | moduleId | 'simulator' | 'about' | 'dashboard'
   const [completedModules, setCompletedModules] = useState([])
+  const [quizStats, setQuizStats] = useState({})
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
+    const savedProgress = localStorage.getItem(STORAGE_KEY)
+    if (savedProgress) {
       try {
-        setCompletedModules(JSON.parse(saved))
+        setCompletedModules(JSON.parse(savedProgress))
       } catch (err) {
         setCompletedModules([])
+      }
+    }
+
+    const savedStats = localStorage.getItem(STATS_KEY)
+    if (savedStats) {
+      try {
+        setQuizStats(JSON.parse(savedStats))
+      } catch (err) {
+        setQuizStats({})
       }
     }
   }, [])
@@ -45,10 +57,22 @@ function App() {
     })
   }
 
+  function handleQuizAttempt(moduleId, score, total, durationSeconds) {
+    setQuizStats((prev) => {
+      const updated = {
+        ...prev,
+        [moduleId]: { score, total, durationSeconds, completedAt: Date.now() },
+      }
+      localStorage.setItem(STATS_KEY, JSON.stringify(updated))
+      return updated
+    })
+  }
+
   const selectedModule = modules.find((mod) => mod.id === view)
   const showList = view === 'list'
   const showSimulator = view === 'simulator'
   const showAboutPage = view === 'about'
+  const showDashboard = view === 'dashboard'
 
   return (
     <div className="app">
@@ -72,6 +96,7 @@ function App() {
             completedModules={completedModules}
             onSelectModule={handleSelectModule}
             onSelectSimulator={handleSelectSimulator}
+            onSelectDashboard={() => setView('dashboard')}
           />
         )}
 
@@ -82,12 +107,17 @@ function App() {
             isCompleted={completedModules.includes(selectedModule.id)}
             onBack={handleBack}
             onModuleComplete={handleModuleComplete}
+            onQuizAttempt={handleQuizAttempt}
           />
         )}
 
         {showSimulator && <Simulator onBack={handleBack} />}
 
         {showAboutPage && <AboutPage onBack={handleBack} />}
+
+        {showDashboard && (
+          <Dashboard modules={modules} quizStats={quizStats} onBack={handleBack} />
+        )}
       </main>
 
       {!showAboutPage && (

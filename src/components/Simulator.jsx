@@ -82,7 +82,7 @@ function Simulator({ onBack }) {
   const lineY2 = Math.min(1.3, Math.max(-0.3, m * lineX2 + b))
 
   return (
-    <div className="module-detail">
+    <div className="module-detail view-transition">
       <button className="btn-back" onClick={onBack}>
         ← Kembali ke Daftar Modul
       </button>

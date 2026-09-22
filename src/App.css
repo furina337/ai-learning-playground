@@ -258,6 +258,159 @@ body {
   border-radius: 999px;
 }
 
+/* Page transition animation */
+.view-transition {
+  animation: viewFadeIn 0.35s ease;
+}
+
+@keyframes viewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Challenge timer note */
+.challenge-note {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-top: 16px;
+}
+
+/* Quiz timer */
+.quiz-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quiz-timer {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.quiz-timer-urgent {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.quiz-timer-track {
+  height: 4px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 8px 0 16px;
+}
+
+.quiz-timer-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 1s linear;
+}
+
+.quiz-timer-fill-urgent {
+  background: var(--danger);
+}
+
+.quiz-result-time {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
+
+/* Dashboard */
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 20px 0 28px;
+}
+
+.stat-card {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-card-label {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.stat-card-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--ink);
+}
+
+.stat-card-value-small {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.stat-card-sub {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stats-row {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+.stats-row-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.stats-row-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.stats-row-badge {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.stats-row-badge-pass {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.stats-row-badge-fail {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.stats-row-details {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+}
+
 /* Progress Bar */
 .progress-wrapper {
   margin-bottom: 32px;
