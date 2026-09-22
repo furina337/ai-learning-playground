@@ -13,7 +13,7 @@ function groupBySection(modules) {
   return groups
 }
 
-function ModuleList({ modules, completedModules, onSelectModule, onSelectSimulator, onSelectDashboard }) {
+function ModuleList({ modules, completedModules, onSelectModule, onSelectSimulator, onSelectDashboard, onSelectAssistant }) {
   const groups = groupBySection(modules)
 
   return (
@@ -78,6 +78,18 @@ function ModuleList({ modules, completedModules, onSelectModule, onSelectSimulat
               <span className="module-layer-tag">Progress kamu</span>
               <h3>Statistik Kuis</h3>
               <p>Lihat skor, persentase, dan modul tercepat yang sudah kamu selesaikan.</p>
+            </button>
+          </div>
+
+          <div className="module-item">
+            <div className="module-node">
+              <span className="node-dot node-dot-bonus">💬</span>
+            </div>
+
+            <button className="module-card module-card-bonus" onClick={onSelectAssistant}>
+              <span className="module-layer-tag">Tanya jawab</span>
+              <h3>Asisten AI</h3>
+              <p>Punya pertanyaan soal materi AI? Tanyakan langsung ke asisten berbasis modul ini.</p>
             </button>
           </div>
         </div>

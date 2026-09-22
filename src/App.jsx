@@ -5,6 +5,7 @@ import Simulator from './components/Simulator.jsx'
 import NetworkDiagram from './components/NetworkDiagram.jsx'
 import AboutPage from './components/AboutPage.jsx'
 import Dashboard from './components/Dashboard.jsx'
+import AIAssistant from './components/AIAssistant.jsx'
 import modules from './data/modules.js'
 import quizzes from './data/quizzes.js'
 
@@ -12,7 +13,7 @@ const STORAGE_KEY = 'ai-learning-playground-progress'
 const STATS_KEY = 'ai-learning-playground-stats'
 
 function App() {
-  const [view, setView] = useState('list') // 'list' | moduleId | 'simulator' | 'about' | 'dashboard'
+  const [view, setView] = useState('list') // 'list' | moduleId | 'simulator' | 'about' | 'dashboard' | 'assistant'
   const [completedModules, setCompletedModules] = useState([])
   const [quizStats, setQuizStats] = useState({})
 
@@ -73,6 +74,7 @@ function App() {
   const showSimulator = view === 'simulator'
   const showAboutPage = view === 'about'
   const showDashboard = view === 'dashboard'
+  const showAssistant = view === 'assistant'
 
   return (
     <div className="app">
@@ -97,6 +99,7 @@ function App() {
             onSelectModule={handleSelectModule}
             onSelectSimulator={handleSelectSimulator}
             onSelectDashboard={() => setView('dashboard')}
+            onSelectAssistant={() => setView('assistant')}
           />
         )}
 
@@ -117,6 +120,10 @@ function App() {
 
         {showDashboard && (
           <Dashboard modules={modules} quizStats={quizStats} onBack={handleBack} />
+        )}
+
+        {showAssistant && (
+          <AIAssistant modules={modules} onBack={handleBack} onOpenModule={handleSelectModule} />
         )}
       </main>
 
