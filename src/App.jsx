@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import ModuleList from './components/ModuleList.jsx'
 import ModuleDetail from './components/ModuleDetail.jsx'
 import Simulator from './components/Simulator.jsx'
-import NetworkDiagram from './components/NetworkDiagram.jsx'
 import AboutPage from './components/AboutPage.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import AIAssistant from './components/AIAssistant.jsx'
@@ -16,6 +15,7 @@ function App() {
   const [view, setView] = useState('list') // 'list' | moduleId | 'simulator' | 'about' | 'dashboard' | 'assistant'
   const [completedModules, setCompletedModules] = useState([])
   const [quizStats, setQuizStats] = useState({})
+  const [homepageAnswer, setHomepageAnswer] = useState(null)
 
   useEffect(() => {
     const savedProgress = localStorage.getItem(STORAGE_KEY)
@@ -43,6 +43,17 @@ function App() {
 
   function handleSelectSimulator() {
     setView('simulator')
+  }
+
+  function handleTryFirstExperiment() {
+    document.getElementById('homepage-tryout')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+  }
+
+  function handleHomepageAnswer(index) {
+    setHomepageAnswer(index)
   }
 
   function handleBack() {
@@ -80,15 +91,69 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="app-header-text">
-          <span className="eyebrow">AI Learning Playground</span>
-          <h1>Pahami cara kerja kecerdasan buatan, selangkah demi selangkah.</h1>
+          <span className="eyebrow">AI LEARNING PLAYGROUND</span>
+          <h1>Learn how AI actually works, by playing with it yourself</h1>
           <p>
-            Enam modul singkat membawamu dari konsep dasar AI, cara kerja neural
-            network, sampai ke isu etika dan risikonya — lengkap dengan kuis dan
-            simulator interaktif di tiap tahap.
+            AI Learning Playground memberi kamu eksperimen sederhana dan materi singkat
+            untuk memahami AI tanpa harus membaca buku teks. Tidak perlu coding — pilih
+            satu eksperimen, coba, lalu lihat apa yang terjadi.
           </p>
+          <button className="hero-cta" onClick={handleTryFirstExperiment}>
+            Try your first AI experiment
+          </button>
         </div>
-        <NetworkDiagram />
+
+        <section className="homepage-tryout" id="homepage-tryout" aria-labelledby="tryout-title">
+          <div className="tryout-topline">
+            <span className="tryout-kicker">COBA SEKARANG</span>
+            <span className="tryout-number">01</span>
+          </div>
+          <p className="tryout-scenario">
+            HP kamu bisa terbuka otomatis begitu kamu melihat ke kamera depan, bahkan saat
+            kamu memakai kacamata baru atau pencahayaan ruangan berubah.
+          </p>
+          <h2 id="tryout-title">Kemampuan ini paling menunjukkan ciri utama AI, yaitu...</h2>
+
+          <div className="tryout-options">
+            {quizzes['apa-itu-ai'][0].options.map((option, index) => {
+              const isSelected = homepageAnswer === index
+              const isCorrect = index === quizzes['apa-itu-ai'][0].correctIndex
+              const showResult = homepageAnswer !== null
+              const stateClass = showResult
+                ? isCorrect
+                  ? ' tryout-option-correct'
+                  : isSelected
+                    ? ' tryout-option-wrong'
+                    : ''
+                : ''
+
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  className={`tryout-option${stateClass}`}
+                  onClick={() => handleHomepageAnswer(index)}
+                  disabled={showResult}
+                >
+                  <span className="tryout-option-index">{String.fromCharCode(65 + index)}</span>
+                  <span>{option}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {homepageAnswer !== null && (
+            <div className={`tryout-feedback ${homepageAnswer === quizzes['apa-itu-ai'][0].correctIndex ? 'tryout-feedback-correct' : 'tryout-feedback-wrong'}`}>
+              <strong>
+                {homepageAnswer === quizzes['apa-itu-ai'][0].correctIndex ? 'Benar.' : 'Belum tepat.'}
+              </strong>{' '}
+              {quizzes['apa-itu-ai'][0].explanation}
+              <button className="tryout-module-link" type="button" onClick={() => handleSelectModule('apa-itu-ai')}>
+                Lanjut ke modul “Apa itu AI?” →
+              </button>
+            </div>
+          )}
+        </section>
       </header>
 
       <main className="app-main">
