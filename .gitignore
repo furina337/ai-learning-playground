@@ -1,1 +1,8 @@
+node_modules
+dist
 .vercel
+.env
+.env.local
+.env.*
+!.env.example
+test.json
