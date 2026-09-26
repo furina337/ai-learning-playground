@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { askAssistant } from '../utils/askAssistant';
 
-export default function AIAssistant() {
+export default function AIAssistant({ modules = [], onBack, onOpenModule }) {
   const [messages, setMessages] = useState([
     {
       sender: 'ai',
@@ -38,4 +38,88 @@ export default function AIAssistant() {
     }
   };
 
+  const suggestedQuestions = modules.slice(0, 4).map((mod) => `Apa itu ${mod.title}?`);
+
+  const handleChipClick = (question) => {
+    handleSend(question);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
+    <div className="module-detail view-transition">
+      {onBack && (
+        <button className="btn-back" onClick={onBack}>
+          ← Kembali ke Daftar Modul
+        </button>
+      )}
+
+      <h2>Asisten AI</h2>
+      <p className="assistant-intro">
+        Tanyakan apa saja seputar materi yang ada di website ini. Jawaban dihasilkan oleh AI
+        berdasarkan modul yang sudah kamu pelajari.
+      </p>
+
+      {suggestedQuestions.length > 0 && (
+        <div className="assistant-suggestions">
+          {suggestedQuestions.map((question) => (
+            <button
+              key={question}
+              className="assistant-chip"
+              onClick={() => handleChipClick(question)}
+              disabled={isLoading}
+            >
+              {question}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="assistant-chat">
+        {messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`assistant-bubble ${
+              msg.sender === 'user' ? 'assistant-bubble-user' : 'assistant-bubble-assistant'
+            }`}
+          >
+            <p>{msg.text}</p>
+            {msg.sender === 'ai' && msg.moduleId && onOpenModule && (
+              <button
+                className="assistant-source-link"
+                onClick={() => onOpenModule(msg.moduleId)}
+              >
+                Buka modul terkait →
+              </button>
+            )}
+          </div>
+        ))}
+        {isLoading && (
+          <div className="assistant-bubble assistant-bubble-assistant">
+            <p>Mengetik jawaban...</p>
+          </div>
+        )}
+      </div>
+
+      <div className="assistant-input-row">
+        <input
+          type="text"
+          className="assistant-input"
+          placeholder="Tulis pertanyaanmu di sini..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={isLoading}
+        />
+        <button className="btn-primary" onClick={() => handleSend()} disabled={isLoading}>
+          Kirim
+        </button>
+      </div>
+    </div>
+  );
+}
