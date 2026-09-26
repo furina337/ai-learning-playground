@@ -1,82 +1,35 @@
-const STOPWORDS = new Set([
-  'apa', 'itu', 'yang', 'adalah', 'dengan', 'untuk', 'dari', 'di', 'ke', 'pada',
-  'dan', 'atau', 'bagaimana', 'kenapa', 'mengapa', 'ini', 'saya', 'kamu', 'kita',
-  'tolong', 'bisa', 'jelaskan', 'tentang', 'apakah', 'gimana', 'cara', 'dalam',
-  'sebuah', 'para', 'juga', 'akan', 'sudah', 'belum', 'bagi', 'oleh', 'jadi',
-]
+// src/utils/askAssistant.js
 
-  .map((w) => w.toLowerCase()))
+/**
+ * Fungsi untuk mengirim pertanyaan pengguna ke Backend Serverless (/api/chat)
+ * @param {string} userQuestion - Teks pertanyaan dari pengguna
+ * @returns {Promise} - Respon jawaban teks dari Gemini API
+ */
+export async function askAssistant(userQuestion) {
+  try {
+    // 1. Panggil endpoint serverless Vercel (/api/chat)
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt: userQuestion }),
+    });
 
-function tokenize(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .split(/\s+/)
-    .filter((word) => word.length > 2 && !STOPWORDS.has(word))
-}
+    const data = await response.json();
 
-function buildEntries(modules) {
-  const entries = []
-  modules.forEach((mod) => {
-    mod.content.forEach((paragraph) => {
-      entries.push({
-        moduleId: mod.id,
-        moduleTitle: mod.title,
-        text: paragraph,
-        tokens: tokenize(`${mod.title} ${paragraph}`),
-      })
-    })
-  })
-  return entries
-}
-
-const GREETINGS = ['halo', 'hai', 'hi', 'hello', 'pagi', 'siang', 'malam', 'sore']
-
-export function askAssistant(question, modules) {
-  const trimmed = question.trim().toLowerCase()
-
-  if (GREETINGS.some((g) => trimmed === g || trimmed.startsWith(g + ' '))) {
-    const topics = modules.map((m) => `"${m.title}"`).join(', ')
-    return {
-      text: `Halo! Aku bisa bantu jawab pertanyaan seputar materi di website ini, misalnya soal ${topics}. Coba tanya sesuatu, ya!`,
-      moduleId: null,
+    // 2. Jika respons dari server tidak oke (status HTTP != 200)
+    if (!response.ok) {
+      console.error('Error dari server backend:', data);
+      throw new Error(data.error || 'Gagal terhubung ke Asisten AI.');
     }
-  }
 
-  const questionTokens = tokenize(question)
-  if (questionTokens.length === 0) {
-    return {
-      text: 'Coba tanya dengan kata kunci yang lebih spesifik, misalnya "apa itu bias AI" atau "bagaimana neural network bekerja".',
-      moduleId: null,
-    }
-  }
+    // 3. Kembalikan teks jawaban resmi dari Gemini API
+    return data.reply;
 
-  const entries = buildEntries(modules)
-  let best = null
-  let bestScore = 0
-
-  entries.forEach((entry) => {
-    let score = 0
-    questionTokens.forEach((token) => {
-      if (entry.tokens.includes(token)) score += 1
-    })
-    if (score > bestScore) {
-      bestScore = score
-      best = entry
-    }
-  })
-
-  if (best && bestScore > 0) {
-    return {
-      text: best.text,
-      moduleId: best.moduleId,
-      moduleTitle: best.moduleTitle,
-    }
-  }
-
-  const topics = modules.map((m) => `"${m.title}"`).join(', ')
-  return {
-    text: `Maaf, aku belum menemukan jawaban yang cocok di materi yang ada. Coba tanyakan dengan kata kunci lain, atau jelajahi salah satu modul: ${topics}.`,
-    moduleId: null,
+  } catch (error) {
+    console.error('Error pada askAssistant:', error);
+    // Kembalikan pesan error yang jelas, BUKAN teks jawaban manual yang kaku
+    return `Maaf, terjadi masalah saat menghubungi Asisten AI: ${error.message}. Pastikan koneksi internet lancar dan GEMINI_API_KEY sudah terpasang di Vercel.`;
   }
 }

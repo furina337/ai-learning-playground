@@ -1,92 +1,41 @@
-import { useState } from 'react'
-import { askAssistant } from '../utils/askAssistant.js'
+// src/components/AIAssistant.jsx
+import React, { useState } from 'react';
+import { askAssistant } from '../utils/askAssistant';
 
-const SUGGESTIONS = [
-  'Apa itu AI?',
-  'Apa itu bias dalam AI?',
-  'Bagaimana neural network bekerja?',
-  'Kenapa privasi data penting?',
-]
-
-function AIAssistant({ modules, onBack, onOpenModule }) {
+export default function AIAssistant() {
   const [messages, setMessages] = useState([
     {
-      role: 'assistant',
+      sender: 'ai',
       text: 'Halo! Tanyakan apa saja seputar materi AI di website ini, aku akan coba jawab berdasarkan modul yang sudah dipelajari.',
-      moduleId: null,
     },
-  ])
-  const [input, setInput] = useState('')
+  ]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSend(question) {
-    const trimmed = question.trim()
-    if (!trimmed) return
+  const handleSend = async (questionToSend) => {
+    const textQuery = questionToSend || input;
+    if (!textQuery.trim() || isLoading) return;
 
-    const answer = askAssistant(trimmed, modules)
+    // 1. Tambahkan pesan pengguna ke dalam daftar percakapan
+    const newMessages = [...messages, { sender: 'user', text: textQuery }];
+    setMessages(newMessages);
+    if (!questionToSend) setInput('');
+    setIsLoading(true);
 
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', text: trimmed },
-      { role: 'assistant', text: answer.text, moduleId: answer.moduleId, moduleTitle: answer.moduleTitle },
-    ])
-    setInput('')
-  }
+    try {
+      // 2. Panggil fungsi askAssistant yang sudah terhubung ke Gemini API
+      const aiReply = await askAssistant(textQuery);
 
-  function handleSubmit(e) {
-    e.preventDefault()
-    handleSend(input)
-  }
+      // 3. Tambahkan jawaban AI ke dalam percakapan
+      setMessages((prev) => [...prev, { sender: 'ai', text: aiReply }]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'ai', text: 'Maaf, terjadi kesalahan saat memproses jawaban.' },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="module-detail view-transition assistant-page">
-      <button className="btn-back" onClick={onBack}>
-        ← Kembali ke Daftar Modul
-      </button>
-
-      <h2>Tanya Asisten AI</h2>
-      <p className="module-content assistant-intro">
-        Asisten ini menjawab berdasarkan materi 6 modul yang ada di website — coba
-        tanyakan sesuatu tentang AI, machine learning, neural network, atau etika AI.
-      </p>
-
-      <div className="assistant-chat">
-        {messages.map((msg, index) => (
-          <div key={index} className={`assistant-bubble assistant-bubble-${msg.role}`}>
-            <p>{msg.text}</p>
-            {msg.moduleId && (
-              <button
-                className="assistant-source-link"
-                onClick={() => onOpenModule(msg.moduleId)}
-              >
-                Baca selengkapnya di modul "{msg.moduleTitle}" →
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="assistant-suggestions">
-        {SUGGESTIONS.map((s) => (
-          <button key={s} className="assistant-chip" onClick={() => handleSend(s)}>
-            {s}
-          </button>
-        ))}
-      </div>
-
-      <form className="assistant-input-row" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ketik pertanyaanmu di sini..."
-          className="assistant-input"
-        />
-        <button type="submit" className="btn-primary">
-          Kirim
-        </button>
-      </form>
-    </div>
-  )
-}
-
-export default AIAssistant
